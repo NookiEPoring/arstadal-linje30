@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="sv">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Tvärbanan – Årstadal Avgångar</title>
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tvärbanan – Årstadal Avgångar</title>
+  <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
     h1 { color: #005aa7; }
     ul { list-style-type: none; padding: 0; }
@@ -13,10 +12,11 @@
   </style>
 </head>
 <body>
-<h1>Avgångar från Årstadal (Tvärbanan)</h1>
-<ul id="departures"></ul>
-<script>
-    const apiUrl = `https://transport.integration.sl.se/v1/departures?siteId=9807`;
+  <h1>Avgångar från Årstadal (Tvärbanan)</h1>
+  <ul id="departures"></ul>
+
+  <script>
+    const apiUrl = `https://transport.integration.sl.se/v1/sites/9325/departures`;
 
     async function fetchDepartures() {
       try {
@@ -33,18 +33,7 @@
         const departuresList = document.getElementById("departures");
         departuresList.innerHTML = "";
 
-        const filtered = data.departures.filter(dep => dep.line?.designation === "30" && dep.expected_departure_time && dep.destination?.name);
-        if (filtered.length === 0) {
-          document.getElementById("departures").innerHTML = `
-            <table>
-              <tr><th>Tid</th><th>Destination</th><th>Linje</th></tr>
-              <tr><td>5 min</td><td>Sickla</td><td>30</td></tr>
-              <tr><td>12 min</td><td>Alvik</td><td>30</td></tr>
-              <tr><td>20 min</td><td>Sickla</td><td>30</td></tr>
-            </table>`;
-          return;
-        }
-        filtered.forEach(dep => {
+        data.departures.forEach(dep => {
           const li = document.createElement("li");
           li.textContent = `${dep.line.designation} mot ${dep.destination?.name ?? "okänd"} – avgår ${dep.expected_departure_time ?? "okänd tid"}`;
           departuresList.appendChild(li);
