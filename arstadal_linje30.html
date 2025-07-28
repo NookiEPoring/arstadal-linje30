@@ -1,0 +1,60 @@
+
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Avgångar från Årstadal - Linje 30</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Avgångar från Årstadal (Linje 30)</h1>
+    <table id="departureTable">
+        <thead>
+            <tr>
+                <th>Tid</th>
+                <th>Destination</th>
+                <th>Linje</th>
+                <th>Transporttyp</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        const siteId = 9807;
+
+        async function fetchDepartures() {
+            try {
+                const response = await fetch(`https://transport.integration.sl.se/v1/departures?siteId=${siteId}`);
+                const data = await response.json();
+
+                const tableBody = document.querySelector("#departureTable tbody");
+                tableBody.innerHTML = "";
+
+                data.ResponseData.forEach(dep => {
+                    if (dep.LineNumber === "30" && dep.TransportMode === "TRAM") {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td>${dep.DisplayTime}</td>
+                            <td>${dep.Destination}</td>
+                            <td>${dep.LineNumber}</td>
+                            <td>${dep.TransportMode}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    }
+                });
+            } catch (error) {
+                console.error("Fel vid hämtning av avgångar:", error);
+            }
+        }
+
+        fetchDepartures();
+        setInterval(fetchDepartures, 30000);
+    </script>
+</body>
+</html>
