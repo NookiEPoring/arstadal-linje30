@@ -28,12 +28,14 @@
         });
         const data = await response.json();
 
+        console.log("API-svar:", data); // Logga hela svaret för felsökning
+
         const departuresList = document.getElementById("departures");
         departuresList.innerHTML = "";
 
         data.departures.forEach(dep => {
           const li = document.createElement("li");
-          li.textContent = `${dep.line.designation} mot ${dep.destination.name} – avgår ${dep.expected_departure_time}`;
+          li.textContent = `${dep.line.designation} mot ${dep.destination?.name ?? "okänd"} – avgår ${dep.expected_departure_time ?? "okänd tid"}`;
           departuresList.appendChild(li);
         });
       } catch (error) {
