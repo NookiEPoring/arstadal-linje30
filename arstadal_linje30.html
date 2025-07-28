@@ -1,59 +1,44 @@
-
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-    <meta charset="UTF-8">
-    <title>Avgångar från Årstadal - Linje 30</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tvärbanan – Årstadal Avgångar</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h1 { color: #005aa7; }
+    ul { list-style-type: none; padding: 0; }
+    li { margin-bottom: 10px; }
+  </style>
 </head>
 <body>
-    <h1>Avgångar från Årstadal (Linje 30)</h1>
-    <table id="departureTable">
-        <thead>
-            <tr>
-                <th>Tid</th>
-                <th>Destination</th>
-                <th>Linje</th>
-                <th>Transporttyp</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+  <h1>Avgångar från Årstadal (Tvärbanan)</h1>
+  <ul id="departures"></ul>
 
-    <script>
-        
-        async function fetchDepartures() {
-            try {
-                const response = await fetch(`https://transport.integration.sl.se/v1/departures?siteId=9807`);
-                const data = await response.json();
+  <script>
+    const siteId = 9325; // Site ID för Årstadal enligt Trafiklab
+    const apiUrl = `https://transport.integration.sl.se/v1/sites/${siteId}/departures`;
 
-                const tableBody = document.querySelector("#departureTable tbody");
-                tableBody.innerHTML = "";
+    async function fetchDepartures() {
+      try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
 
-                data.ResponseData.forEach(dep => {
-                    if (dep.LineNumber === "30" && dep.TransportMode === "TRAM") {
-                        const row = document.createElement("tr");
-                        row.innerHTML = `
-                            <td>${dep.DisplayTime}</td>
-                            <td>${dep.Destination}</td>
-                            <td>${dep.LineNumber}</td>
-                            <td>${dep.TransportMode}</td>
-                        `;
-                        tableBody.appendChild(row);
-                    }
-                });
-            } catch (error) {
-                console.error("Fel vid hämtning av avgångar:", error);
-            }
-        }
+        const departuresList = document.getElementById("departures");
+        departuresList.innerHTML = "";
 
-        fetchDepartures();
-        setInterval(fetchDepartures, 30000);
-    </script>
+        data.departures.forEach(dep => {
+          const li = document.createElement("li");
+          li.textContent = `${dep.line.designation} mot ${dep.destination.name} – avgår ${dep.expected_departure_time}`;
+          departuresList.appendChild(li);
+        });
+      } catch (error) {
+        console.error("Fel vid hämtning av avgångar:", error);
+      }
+    }
+
+    fetchDepartures();
+    setInterval(fetchDepartures, 60000); // Uppdatera varje minut
+  </script>
 </body>
 </html>
