@@ -61,7 +61,7 @@
                 } else {
                     line30Departures.forEach(dep => {
                         const li = document.createElement("li");
-                        li.textContent = `Mot ${dep.destination} – ${dep.minutesLeft} min (${dep.display})`;
+                        li.textContent = `Mot ${dep.destination} – (${dep.display}) min`;
                         list.appendChild(li);
                     });
                 }
