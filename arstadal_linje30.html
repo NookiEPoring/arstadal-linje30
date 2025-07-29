@@ -1,51 +1,80 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tvärbanan – Årstadal Avgångar</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    h1 { color: #005aa7; }
-    ul { list-style-type: none; padding: 0; }
-    li { margin-bottom: 10px; }
-  </style>
+    <meta charset="UTF-8">
+    <title>Avgångar från Årstadal – Linje 30</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            background: white;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-left: 5px solid #0078D7;
+        }
+    </style>
 </head>
 <body>
-  <h1>Avgångar från Årstadal (Tvärbanan)</h1>
-  <ul id="departures"></ul>
+    <h1>Avgångar från Årstadal – Linje 30</h1>
+    <ul id="departure-list">
+        <li>Laddar avgångar...</li>
+    </ul>
 
-  <script>
-    const originalApiUrl = 'https://transport.integration.sl.se/v1/sites/9807/departures';
-    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(originalApiUrl)}`;
+    <script>
+        async function getDepartures() {
+            const apiUrl = "https://transport.integration.sl.se/v1/sites/9807/departures";
+            const list = document.getElementById("departure-list");
+            list.innerHTML = "<li>Laddar avgångar...</li>";
 
-    async function fetchDepartures() {
-      try {
-        const response = await fetch(proxyUrl, {
-          method: "GET",
-          headers: {
-            "Cache-Control": "no-cache"
-          }
-        });
-        const data = await response.json();
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                const now = new Date();
 
-        console.log("API-svar:", data); // Logga hela svaret för felsökning
+                const line30Departures = data.departures
+                    .filter(dep => dep.line.designation === "30" && dep.expected)
+                    .map(dep => {
+                        const expectedTime = new Date(dep.expected);
+                        const minutesLeft = Math.round((expectedTime - now) / 60000);
+                        return {
+                            destination: dep.destination,
+                            minutesLeft: minutesLeft,
+                            display: dep.display
+                        };
+                    })
+                    .sort((a, b) => a.minutesLeft - b.minutesLeft);
 
-        const departuresList = document.getElementById("departures");
-        departuresList.innerHTML = "";
+                list.innerHTML = "";
 
-        data.departures.forEach(dep => {
-          const li = document.createElement("li");
-          li.textContent = `${dep.line.designation} mot ${dep.destination?.name ?? "okänd"} – avgår ${dep.expected_departure_time ?? "okänd tid"}`;
-          departuresList.appendChild(li);
-        });
-      } catch (error) {
-        console.error("Fel vid hämtning av avgångar:", error);
-      }
-    }
+                if (line30Departures.length === 0) {
+                    list.innerHTML = "<li>Inga avgångar för linje 30 just nu.</li>";
+                } else {
+                    line30Departures.forEach(dep => {
+                        const li = document.createElement("li");
+                        li.textContent = `Mot ${dep.destination} – ${dep.minutesLeft} min (${dep.display})`;
+                        list.appendChild(li);
+                    });
+                }
 
-    fetchDepartures();
-    setInterval(fetchDepartures, 60000); // Uppdatera varje minut
-  </script>
+            } catch (error) {
+                list.innerHTML = `<li>Fel vid hämtning av data: ${error.message}</li>`;
+                console.error("Fel vid hämtning av avgångar:", error);
+            }
+        }
+
+        // Kör direkt och uppdatera var 30:e sekund
+        getDepartures();
+        setInterval(getDepartures, 30000);
+    </script>
 </body>
 </html>
