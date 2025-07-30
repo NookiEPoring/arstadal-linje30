@@ -61,7 +61,7 @@
                 } else {
                     line17Departures.forEach(dep => {
                         const li = document.createElement("li");
-                        li.textContent = `Mot ${dep.destination} – (${dep.display})`;
+                        li.textContent = `Mot ${dep.destination} – ${dep.display}`;
                         list.appendChild(li);
                     });
                 }
