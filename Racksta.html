@@ -42,7 +42,7 @@
                 const now = new Date();
 
                 const line17Departures = data.departures
-                    .filter(dep => dep.line.designation === "17" && dep.expected)
+                    .filter(dep => dep.line.designation === "19" && dep.expected)
                     .map(dep => {
                         const expectedTime = new Date(dep.expected);
                         const minutesLeft = Math.round((expectedTime - now) / 60000);
@@ -57,7 +57,7 @@
                 list.innerHTML = "";
 
                 if (line17Departures.length === 0) {
-                    list.innerHTML = "<li>Inga avgångar för linje 17 just nu.</li>";
+                    list.innerHTML = "<li>Inga avgångar för linje 19 just nu.</li>";
                 } else {
                     line17Departures.forEach(dep => {
                         const li = document.createElement("li");
