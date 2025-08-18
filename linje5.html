@@ -2,7 +2,7 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
-    <title>Avgångar från Årstadal – Linje 30</title>
+    <title>Avgångar från Marievik – Buss 5</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -25,14 +25,14 @@
     </style>
 </head>
 <body>
-    <h1>Avgångar från Årstadal – Linje 30</h1>
+    <h1>Avgångar från Marievik – Buss 5</h1>
     <ul id="departure-list">
         <li>Laddar avgångar...</li>
     </ul>
 
     <script>
         async function getDepartures() {
-            const apiUrl = "https://transport.integration.sl.se/v1/sites/9807/departures";
+            const apiUrl = "https://transport.integration.sl.se/v1/sites/1619/departures";
             const list = document.getElementById("departure-list");
             list.innerHTML = "<li>Laddar avgångar...</li>";
 
@@ -41,8 +41,8 @@
                 const data = await response.json();
                 const now = new Date();
 
-                const line30Departures = data.departures
-                    .filter(dep => dep.line.designation === "30" && dep.expected)
+                const bus5Departures = data.departures
+                    .filter(dep => dep.line.designation === "5" && dep.expected)
                     .map(dep => {
                         const expectedTime = new Date(dep.expected);
                         const minutesLeft = Math.round((expectedTime - now) / 60000);
@@ -56,10 +56,10 @@
 
                 list.innerHTML = "";
 
-                if (line30Departures.length === 0) {
-                    list.innerHTML = "<li>Inga avgångar för linje 30 just nu.</li>";
+                if (bus5Departures.length === 0) {
+                    list.innerHTML = "<li>Inga avgångar för buss 5 just nu.</li>";
                 } else {
-                    line30Departures.forEach(dep => {
+                    bus5Departures.forEach(dep => {
                         const li = document.createElement("li");
                         li.textContent = `Mot ${dep.destination} – (${dep.display}) min`;
                         list.appendChild(li);
